@@ -7,7 +7,7 @@
   --foreground: #171717;
 }
 
-@media (prefers-color-scheme: dark) {
+@media (prefers-color-scheme: dark) { 
   :root {
     --background: #0a0a0a;
     --foreground: #ededed;
@@ -18,4 +18,195 @@ body {
   color: var(--foreground);
   background: var(--background);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 222.2 84% 4.9%;
+  }
+ 
+  .dark {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 212.7 26.8% 83.9%;
+  }
+}
+
+@media print {
+  /* Basic page setup */
+  @page {
+    size: A4;
+    margin: 15px 10px 15px 10px;/*1cm 1cm 2.5cm 1cm; /* top right bottom left */
+  }
+
+  /* Hide non-printable elements */
+  .no-print, 
+  .print-button {
+    display: none !important;
+  }
+
+  /* Body and container adjustments */
+  body {
+    margin: 0;
+    padding: 0;
+    margin-bottom: 2.5cm !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    color-adjust: exact !important;
+    background: white !important;
+  }
+
+  .max-w-7xl {
+    max-width: none !important;
+    padding: 0.5cm !important;
+    margin: 0 !important;
+  }
+
+  /* Chart size and page break control */
+  .h-96 {
+    height: 400px !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+    margin-bottom: 0.5cm !important;
+  }
+
+  /* Chart container and legend styling */
+  .chart-container {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    text-align: center !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+
+  .recharts-legend-wrapper {
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    flex-wrap: wrap !important;
+    width: 100% !important;
+    margin-top: 0.5cm !important;
+    position: relative !important;
+    bottom: 0 !important;
+  }
+
+  /* Grid layout control */
+  .grid-cols-2 {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 0.5cm !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+    margin-bottom: 1cm !important;
+  }
+
+  /* Card styling */
+  .card {
+    border: 1px solid #e5e7eb !important;
+    box-shadow: none !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+    background-color: white !important;
+    margin-bottom: 0.5cm !important;
+  }
+
+  /* Table optimizations */
+  table {
+    font-size: 9pt !important;
+    width: 100% !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+
+  /* Text adjustments */
+  .text-4xl {
+    font-size: 24pt !important;
+  }
+
+  .text-xl {
+    font-size: 14pt !important;
+  }
+
+  /* Color and background handling */
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    color-adjust: exact !important;
+  }
+
+  /* Page break handling */
+  .time-allocation-section {
+    page-break-before: always !important;
+    break-before: always !important;
+    margin-top: 1cm !important;
+  }
+
+  .project-details-section {
+    page-break-before: always !important;
+    break-before: always !important;
+    margin-top: 1cm !important;
+  }
+
+  /* Update footer styles */
+  .print-footer {
+    position: running(footer);
+    display: block;
+    width: 100%;
+    height: 2cm;
+    background-color: white;
+    border-top: 1px solid #e5e7eb;
+  }
+
+  /* Place the footer */
+  @page {
+    @bottom-center {
+      content: element(footer);
+    }
+  }
+
+  /* Content spacing for fixed footer */
+  .min-h-screen {
+    min-height: 0 !important;
+    padding-bottom: 1cm !important;
+  }
+
+  /* Ensure content is above background but below footer */
+  .relative {
+    position: relative !important;
+    z-index: 1 !important;
+  }
+
+  /* Force print elements visibility */
+  .print\:block {
+    display: block !important;
+  }
+
+  .hidden.print\:block {
+    display: block !important;
+  }
+
+  /* Force background colors */
+  .bg-white {
+    background-color: white !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  .border-teal-100 {
+    border-color: #99f6e4 !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
 }
