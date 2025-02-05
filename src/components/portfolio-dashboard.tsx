@@ -13,11 +13,15 @@ import {
 } from "@/components/ui/card";
 
 import { 
-    XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer,
-    ComposedChart, Line, Area, Scatter,
+    XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
+    ComposedChart, Area, Scatter,
     BarChart, Bar, Cell,
     PieChart, Pie
   } from 'recharts';
+
+  import Image from "next/image";
+
+
 
 // Define interfaces for our data structures
 interface ProjectData {
@@ -39,14 +43,6 @@ interface BubbleDataPoint {
   'Duration (Months)': number;
   status: ProjectData['Status'];
   progress: number;
-}
-
-interface RadarDataPoint {
-  name: string;
-  'Contract Value': number;
-  Duration: number;
-  Manpower: number;
-  Progress: number;
 }
 
 type CriticalityLevel = 'High' | 'Medium' | 'Normal';
@@ -80,18 +76,16 @@ const PROJECT_CRITICALITY: Record<string, CriticalityLevel> = {
 };
 
 // Helper functions
-const parseNumber = (value: any): number => {
-  if (typeof value === 'string') {
-    return parseFloat(value.replace(/,/g, '')) || 0;
+const parseNumber = (value: string | number | null | undefined): number => {
+  if (typeof value === "string") {
+    return parseFloat(value.replace(/,/g, "")) || 0;
   }
-  return typeof value === 'number' ? value : 0;
+  return value ?? 0; // Ensure `null` or `undefined` return 0
 };
 
-const parsePercentage = (value: any): number => {
-  if (typeof value === 'string') {
-    return parseFloat(value.replace('%', '')) / 100 || 0;
-  }
-  return typeof value === 'number' ? value : 0;
+
+const parsePercentage = (value: string | number): number => {
+  return typeof value === "string" ? parseFloat(value.replace("%", "")) / 100 : value;
 };
 
 const getCriticalityForProject = (projectName: string): CriticalityLevel => {
@@ -191,100 +185,55 @@ class ChartErrorBoundary extends React.Component<
     }
 }
 
-const ChartWrapper: React.FC<{children: React.ReactElement}> = ({children}) => {
-  const [dimensions, setDimensions] = React.useState({ width: 0, height: 0 });
-  const chartRef = React.useRef<HTMLDivElement>(null);
-
-  React.useEffect(() => {
-      const updateDimensions = () => {
-          if (chartRef.current) {
-              setDimensions({
-                  width: chartRef.current.offsetWidth,
-                  height: chartRef.current.offsetHeight
-              });
-          }
-      };
-
-      updateDimensions();
-      window.addEventListener('resize', updateDimensions);
-
-      // Initial timeout to ensure proper rendering
-      const timeout = setTimeout(updateDimensions, 100);
-
-      return () => {
-          window.removeEventListener('resize', updateDimensions);
-          clearTimeout(timeout);
-      };
-  }, []);
-
-  return (
-      <div ref={chartRef} className="h-96 w-full" style={{ minHeight: '400px' }}>
-          {dimensions.width > 0 && dimensions.height > 0 && (
-              <ResponsiveContainer width="100%" height="100%" debounce={50}>
-                  {children}
-              </ResponsiveContainer>
-          )}
-      </div>
-  );
-};
-
-const PortfolioDashboard = () => {
+const PortfolioDashboard: React.FC = () => {
   const [data, setData] = React.useState<ProjectData[]>([]);
   const [loading, setLoading] = React.useState(true);
 
-    // const handlePrint = () => {
-    //     document.body.classList.add('first-page'); // Apply class for first page
-    //     setTimeout(() => {
-    //       window.print();
-    //       setTimeout(() => {
-    //         document.body.classList.remove('first-page'); // Remove after printing
-    //       }, 500);
-    //     }, 200);
-    // };     
-    const handlePrint = () => {
-      window.print();
+  const handlePrint = () => {
+    window.print();
+  };
+
+  React.useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch('./One Page Portfolio.xlsx');
+        if (!response.ok) {
+            throw new Error(`Failed to fetch data: ${response.status} ${response.statusText}`);
+        }
+        
+        const arrayBuffer = await response.arrayBuffer();
+        const workbook = XLSX.read(new Uint8Array(arrayBuffer), {
+            type: 'array',
+            cellDates: false,
+            cellNF: true,
+            cellText: false,
+            cellStyles: true,
+        });
+        
+        const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+        const jsonData = XLSX.utils.sheet_to_json(firstSheet, {
+            raw: false,
+            dateNF: 'dd/mm/yyyy'
+        }) as ProjectData[];
+        
+        // Validate and filter data
+        const validData = jsonData.filter(item => 
+            item['Project Name'] && 
+            item['Project Name'] !== 'Total' &&
+            item.Status in STATUS_COLORS
+        );
+        
+        setData(validData);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      } finally {
+        setLoading(false);
+      }
     };
-    React.useEffect(() => {
-      const fetchData = async () => {
-          try {
-              setLoading(true);
-              const response = await fetch('./One Page Portfolio.xlsx');
-              if (!response.ok) {
-                  throw new Error(`Failed to fetch data: ${response.status} ${response.statusText}`);
-              }
-              
-              const arrayBuffer = await response.arrayBuffer();
-              const workbook = XLSX.read(new Uint8Array(arrayBuffer), {
-                  type: 'array',
-                  cellDates: false,
-                  cellNF: true,
-                  cellText: false,
-                  cellStyles: true,
-              });
-              
-              const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
-              const jsonData = XLSX.utils.sheet_to_json(firstSheet, {
-                  raw: false,
-                  dateNF: 'dd/mm/yyyy'
-              }) as ProjectData[];
-              
-              // Validate and filter data
-              const validData = jsonData.filter(item => 
-                  item['Project Name'] && 
-                  item['Project Name'] !== 'Total' &&
-                  item.Status in STATUS_COLORS
-              );
-              
-              setData(validData);
-          } catch (error) {
-              console.error('Error loading data:', error);
-          } finally {
-              setLoading(false);
-          }
-      };
-  
-      fetchData();
-    }, []);
+
+    fetchData();
+  }, []);
 
   if (loading) {
     return (
@@ -300,15 +249,6 @@ const PortfolioDashboard = () => {
     sum + parseNumber(project.manpower), 0);
 
   // Prepare chart data
-  const radarData: RadarDataPoint[] = data.map(project => ({
-    name: project['Project Name'],
-    'Contract Value': (parseNumber(project['Contract Value']) / totalContractValue) * 100,
-    'Duration': (parseNumber(project['Duration (Months)']) / 
-      data.reduce((max, p) => Math.max(max, parseNumber(p['Duration (Months)'])), 0)) * 100,
-    'Manpower': (parseNumber(project.manpower) / totalManpower) * 100,
-    'Progress': parsePercentage(project['Time spending']) * 100
-  }));
-
   const bubbleData: BubbleDataPoint[] = data
     .map(project => ({
         name: project['Project Name'],
@@ -329,14 +269,14 @@ const PortfolioDashboard = () => {
 
     return (
       <div className="hidden print:block print-footer" style={{
-          position: 'fixed',
-          bottom: 0,
-          left: 0,
-          right: 0,
-          width: '100%',
-          backgroundColor: 'white',
-          borderTop: '1px solid #e5e7eb',
-          zIndex: 9999
+        position: 'fixed',
+        bottom: 0,
+        left: 0,
+        right: 0,
+        width: '100%',
+        backgroundColor: 'white',
+        borderTop: '1px solid #e5e7eb',
+        zIndex: 9999
       }}>
         <div className="flex justify-between items-center text-gray-600 px-8 py-4 w-full">
           <div className="flex items-center gap-4">
@@ -380,14 +320,16 @@ const PortfolioDashboard = () => {
                 </div>
               </div>
               <div className="border-l border-gray-200 pl-8">
-                <img 
-                  src="/Elegancia_Logo.png" 
-                  alt="Elegancia Logo" 
-                  className="h-16 w-auto"
+                <Image
+                  src="/Elegancia_Logo.png"
+                  alt="Elegancia Logo"
+                  width={80} 
+                  height={64} 
+                  priority
                 />
+              </div>
             </div>
           </div>
-        </div>
 
           {/* All Charts Row */}
           <div className="flex gap-6 mb-8">
@@ -501,7 +443,6 @@ const PortfolioDashboard = () => {
                               cx,
                               cy,
                               midAngle,
-                              innerRadius,
                               outerRadius,
                               value,
                               name
@@ -729,6 +670,7 @@ const PortfolioDashboard = () => {
           </button>
         </div>
       </div>
+      <PrintFooter />
     </div>
   );
 };

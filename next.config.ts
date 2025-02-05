@@ -1,13 +1,10 @@
-import type { NextConfig } from 'next'
+import { NextConfig } from 'next'; // ✅ Import the type
 
-const config: NextConfig = {
-  output: 'export',
+const nextConfig: NextConfig = {
+  output: 'export', // Enables static export mode
   images: {
-    unoptimized: true,
+    unoptimized: true, // Required for GitHub Pages
   },
-  eslint: {
-    ignoreDuringBuilds: true, // This will ignore ESLint errors during build
-  },
-}
+};
 
-export default config
+export default nextConfig;
