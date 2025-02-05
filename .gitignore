@@ -15,10 +15,14 @@
 
 # next.js
 /.next/
+# Keep the `/out/` directory ignored, but allow `/docs/` for GitHub Pages
 /out/
 
 # production
 /build
+
+# GitHub Pages Deployment Folder (Make Sure to Keep This)
+!docs/  # 🚀 Allow GitHub Pages folder
 
 # misc
 .DS_Store
