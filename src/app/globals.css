@@ -1,0 +1,211 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+@media (prefers-color-scheme: dark) { 
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+body {
+  color: var(--foreground);
+  background: var(--background);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 222.2 84% 4.9%;
+  }
+ 
+  .dark {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 212.7 26.8% 83.9%;
+  }
+}
+
+@media print {
+  /* Basic page setup */
+  @page {
+    size: A4 landscape;
+    margin: 0.5cm;
+    margin-bottom: 0.25cm;  /* Space for footer */
+ 
+  }
+
+  body {
+    margin: 0;
+    padding: 0;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* First page content (Portfolio Overview + 3 charts) */
+  .first-page {
+    page-break-after: always !important;
+    margin-bottom: 1cm !important;
+  }
+
+  /* Container adjustments */
+  .max-w-7xl {
+    max-width: none !important;
+    padding: 0.5cm !important;
+  }
+
+  /* Portfolio Overview adjustments */
+  .first-page > div:first-child {
+    margin-bottom: 0.5cm !important;
+    padding: 0.3cm !important;
+  }
+
+  /* Charts Row Layout */
+  .first-page .flex.gap-6 {
+    display: flex !important;
+    gap: 0.5cm !important;
+  }
+
+  /* Individual Charts */
+  .first-page .card {
+    flex: 1 !important;
+    margin: 0 !important;
+    box-shadow: none !important;
+    border: 1px solid #e5e7eb !important;
+  }
+
+  /* Chart Heights */
+  .ChartWrapper, 
+  .ResponsiveContainer,
+  .recharts-wrapper {
+    height: 270px !important;
+  }
+
+  /* Second page */
+  .time-allocation-section {
+    page-break-before: always !important;
+    page-break-after: always !important;
+    break-before: page !important;
+    break-after: page !important;
+    margin-top: 0 !important;
+    padding: 0.5cm !important;
+    margin-bottom: 1cm !important;
+  }
+
+  /* Third page */
+  .project-details-section {
+    page-break-before: always !important;
+    break-before: page !important;
+    break-inside: avoid !important;
+    display: block !important;
+    margin-top: 0 !important;
+    padding: 0.5cm !important;
+    margin-bottom: 1cm !important;
+  }
+
+  /* Card Content Spacing */
+  .CardHeader {
+    padding: 0.2cm !important;
+  }
+
+  .CardContent {
+    padding: 0.2cm !important;
+  }
+
+  /* Font Adjustments */
+  .text-4xl {
+    font-size: 20pt !important;
+  }
+
+  .text-xl {
+    font-size: 12pt !important;
+  }
+
+  .text-lg {
+    font-size: 10pt !important;
+  }
+
+  .text-sm {
+    font-size: 8pt !important;
+  }
+
+  .text-xs {
+    font-size: 7pt !important;
+  }
+
+  /* Chart Specifics */
+  .recharts-wrapper {
+    width: 100% !important;
+  }
+
+  /* Remove unnecessary margins/padding */
+  .mb-8, .mb-6 {
+    margin-bottom: 0.3cm !important;
+  }
+
+  .p-8, .p-6 {
+    padding: 0.3cm !important;
+  }
+
+  /* Table Formatting */
+  table {
+    page-break-inside: avoid !important;
+  }
+
+  th, td {
+    padding: 0.2cm !important;
+    font-size: 8pt !important;
+  }
+
+  /* Hide Print Button */
+  .no-print {
+    display: none !important;
+  }
+
+  /* Ensure Colors Print */
+  * {
+    -webkit-print-color-adjust: exact !important;
+    color-adjust: exact !important;
+  }
+
+  /* Footer Styles */
+  .print-footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    padding: 0.3cm 0.5cm;
+    font-size: 8pt;
+    border-top: 1px solid #e5e7eb;
+    background-color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .print-footer-left {
+    text-align: left;
+  }
+
+  .print-footer-right {
+    text-align: right;
+    margin-left: auto;
+  }
+}
