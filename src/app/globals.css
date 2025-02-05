@@ -45,168 +45,167 @@ body {
 @media print {
   /* Basic page setup */
   @page {
-    size: A4;
-    margin: 15px 10px 15px 10px;/*1cm 1cm 2.5cm 1cm; /* top right bottom left */
+    size: A4 landscape;
+    margin: 0.5cm;
+    margin-bottom: 0.25cm;  /* Space for footer */
+ 
   }
 
-  /* Hide non-printable elements */
-  .no-print, 
-  .print-button {
-    display: none !important;
-  }
-
-  /* Body and container adjustments */
   body {
     margin: 0;
     padding: 0;
-    margin-bottom: 2.5cm !important;
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
-    color-adjust: exact !important;
-    background: white !important;
   }
 
-  .max-w-7xl {
-    max-width: none !important;
-    padding: 0.5cm !important;
-    margin: 0 !important;
-  }
-
-  /* Chart size and page break control */
-  .h-96 {
-    height: 400px !important;
-    page-break-inside: avoid !important;
-    break-inside: avoid !important;
-    margin-bottom: 0.5cm !important;
-  }
-
-  /* Chart container and legend styling */
-  .chart-container {
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: center !important;
-    justify-content: center !important;
-    text-align: center !important;
-    page-break-inside: avoid !important;
-    break-inside: avoid !important;
-  }
-
-  .recharts-legend-wrapper {
-    display: flex !important;
-    justify-content: center !important;
-    align-items: center !important;
-    flex-wrap: wrap !important;
-    width: 100% !important;
-    margin-top: 0.5cm !important;
-    position: relative !important;
-    bottom: 0 !important;
-  }
-
-  /* Grid layout control */
-  .grid-cols-2 {
-    display: grid !important;
-    grid-template-columns: 1fr 1fr !important;
-    gap: 0.5cm !important;
-    page-break-inside: avoid !important;
-    break-inside: avoid !important;
+  /* First page content (Portfolio Overview + 3 charts) */
+  .first-page {
+    page-break-after: always !important;
     margin-bottom: 1cm !important;
   }
 
-  /* Card styling */
-  .card {
-    border: 1px solid #e5e7eb !important;
-    box-shadow: none !important;
-    page-break-inside: avoid !important;
-    break-inside: avoid !important;
-    background-color: white !important;
+  /* Container adjustments */
+  .max-w-7xl {
+    max-width: none !important;
+    padding: 0.5cm !important;
+  }
+
+  /* Portfolio Overview adjustments */
+  .first-page > div:first-child {
     margin-bottom: 0.5cm !important;
+    padding: 0.3cm !important;
   }
 
-  /* Table optimizations */
-  table {
-    font-size: 9pt !important;
-    width: 100% !important;
-    page-break-inside: avoid !important;
+  /* Charts Row Layout */
+  .first-page .flex.gap-6 {
+    display: flex !important;
+    gap: 0.5cm !important;
+  }
+
+  /* Individual Charts */
+  .first-page .card {
+    flex: 1 !important;
+    margin: 0 !important;
+    box-shadow: none !important;
+    border: 1px solid #e5e7eb !important;
+  }
+
+  /* Chart Heights */
+  .ChartWrapper, 
+  .ResponsiveContainer,
+  .recharts-wrapper {
+    height: 270px !important;
+  }
+
+  /* Second page */
+  .time-allocation-section {
+    page-break-before: always !important;
+    page-break-after: always !important;
+    break-before: page !important;
+    break-after: page !important;
+    margin-top: 0 !important;
+    padding: 0.5cm !important;
+    margin-bottom: 1cm !important;
+  }
+
+  /* Third page */
+  .project-details-section {
+    page-break-before: always !important;
+    break-before: page !important;
     break-inside: avoid !important;
+    display: block !important;
+    margin-top: 0 !important;
+    padding: 0.5cm !important;
+    margin-bottom: 1cm !important;
   }
 
-  /* Text adjustments */
+  /* Card Content Spacing */
+  .CardHeader {
+    padding: 0.2cm !important;
+  }
+
+  .CardContent {
+    padding: 0.2cm !important;
+  }
+
+  /* Font Adjustments */
   .text-4xl {
-    font-size: 24pt !important;
+    font-size: 20pt !important;
   }
 
   .text-xl {
-    font-size: 14pt !important;
+    font-size: 12pt !important;
   }
 
-  /* Color and background handling */
+  .text-lg {
+    font-size: 10pt !important;
+  }
+
+  .text-sm {
+    font-size: 8pt !important;
+  }
+
+  .text-xs {
+    font-size: 7pt !important;
+  }
+
+  /* Chart Specifics */
+  .recharts-wrapper {
+    width: 100% !important;
+  }
+
+  /* Remove unnecessary margins/padding */
+  .mb-8, .mb-6 {
+    margin-bottom: 0.3cm !important;
+  }
+
+  .p-8, .p-6 {
+    padding: 0.3cm !important;
+  }
+
+  /* Table Formatting */
+  table {
+    page-break-inside: avoid !important;
+  }
+
+  th, td {
+    padding: 0.2cm !important;
+    font-size: 8pt !important;
+  }
+
+  /* Hide Print Button */
+  .no-print {
+    display: none !important;
+  }
+
+  /* Ensure Colors Print */
   * {
     -webkit-print-color-adjust: exact !important;
-    print-color-adjust: exact !important;
     color-adjust: exact !important;
   }
 
-  /* Page break handling */
-  .time-allocation-section {
-    page-break-before: always !important;
-    break-before: always !important;
-    margin-top: 1cm !important;
-  }
-
-  .project-details-section {
-    page-break-before: always !important;
-    break-before: always !important;
-    margin-top: 1cm !important;
-  }
-
-  /* Update footer styles */
+  /* Footer Styles */
   .print-footer {
-    position: running(footer);
-    display: block;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
     width: 100%;
-    height: 2cm;
-    background-color: white;
+    padding: 0.3cm 0.5cm;
+    font-size: 8pt;
     border-top: 1px solid #e5e7eb;
+    background-color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
   }
 
-  /* Place the footer */
-  @page {
-    @bottom-center {
-      content: element(footer);
-    }
+  .print-footer-left {
+    text-align: left;
   }
 
-  /* Content spacing for fixed footer */
-  .min-h-screen {
-    min-height: 0 !important;
-    padding-bottom: 1cm !important;
-  }
-
-  /* Ensure content is above background but below footer */
-  .relative {
-    position: relative !important;
-    z-index: 1 !important;
-  }
-
-  /* Force print elements visibility */
-  .print\:block {
-    display: block !important;
-  }
-
-  .hidden.print\:block {
-    display: block !important;
-  }
-
-  /* Force background colors */
-  .bg-white {
-    background-color: white !important;
-    -webkit-print-color-adjust: exact !important;
-    print-color-adjust: exact !important;
-  }
-
-  .border-teal-100 {
-    border-color: #99f6e4 !important;
-    -webkit-print-color-adjust: exact !important;
-    print-color-adjust: exact !important;
+  .print-footer-right {
+    text-align: right;
+    margin-left: auto;
   }
 }

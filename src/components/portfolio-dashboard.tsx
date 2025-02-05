@@ -13,22 +13,11 @@ import {
 } from "@/components/ui/card";
 
 import { 
-    XAxis, 
-    YAxis, 
-    CartesianGrid, 
-    Tooltip, 
-    Legend, 
-    ResponsiveContainer,
-    ComposedChart,     
-    Area, //Line, 
-    Scatter,
-    Cell,  // Add this import
-    RadarChart, 
-    Radar, 
-    PolarGrid, 
-    PolarAngleAxis, 
-    PolarRadiusAxis
-} from 'recharts';
+    XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer,
+    ComposedChart, Line, Area, Scatter,
+    BarChart, Bar, Cell,
+    PieChart, Pie
+  } from 'recharts';
 
 // Define interfaces for our data structures
 interface ProjectData {
@@ -320,15 +309,16 @@ const PortfolioDashboard = () => {
     'Progress': parsePercentage(project['Time spending']) * 100
   }));
 
-  const bubbleData: BubbleDataPoint[] = data.map(project => ({
-    name: project['Project Name'],
-    'Contract Value': parseNumber(project['Contract Value']) / 1000000,
-    manpower: parseNumber(project.manpower),
-    'Duration (Months)': parseNumber(project['Duration (Months)']),
-    status: project.Status,
-    progress: parsePercentage(project['Time spending']) * 100
-  }));
-
+  const bubbleData: BubbleDataPoint[] = data
+    .map(project => ({
+        name: project['Project Name'],
+        'Contract Value': parseNumber(project['Contract Value']) / 1000000,
+        manpower: parseNumber(project.manpower),
+        'Duration (Months)': parseNumber(project['Duration (Months)']),
+        status: project.Status,
+        progress: parsePercentage(project['Time spending']) * 100
+    }))
+    .sort((a, b) => a['Contract Value'] - b['Contract Value']); // Add this sort function
 
   const PrintFooter = () => {
     const currentDate = new Date().toLocaleDateString('en-GB', {
@@ -363,270 +353,384 @@ const PortfolioDashboard = () => {
   };
 
   return (
-    <div className="relative">
-        <div className="min-h-screen bg-gradient-to-br from-teal-50 to-gray-50 print:bg-white">
-            <div className="max-w-7xl mx-auto p-8 print:p-4">
-                {/* Header */}
-                <div className="mb-8 bg-white rounded-xl shadow-lg p-8 border border-teal-100">
-                <div className="flex items-center justify-between">
-                    <div>
-                    <h1 className="text-4xl font-light text-gray-800 mb-2">Portfolio Overview</h1>
-                    <p className="text-gray-500 text-xl">Yahya Chaker</p>
-                    <p className="text-gray-500 text-lg">FM Projects Director</p>
-                    </div>
-                    <div className="flex gap-8">
-                    <div className="text-center">
-                        <p className="text-4xl font-light text-teal-600">{data.length}</p>
-                        <p className="text-sm text-gray-500">Projects</p>
-                    </div>
-                    <div className="text-center">
-                        <p className="text-4xl font-light text-teal-600">{(totalContractValue / 1000000).toFixed(1)}M</p>
-                        <p className="text-sm text-gray-500">QAR Value</p>
-                    </div>
-                    <div className="text-center">
-                        <p className="text-4xl font-light text-teal-600">{totalManpower}</p>
-                        <p className="text-sm text-gray-500">Personnel</p>
-                    </div>
-                    </div>
+    <div className="min-h-screen bg-gradient-to-br from-teal-50 to-gray-50">
+      <div className="max-w-7xl mx-auto p-8">
+        {/* First Page Content */}
+        <div className="first-page">
+          {/* Portfolio Overview */}
+          <div className="mb-6 bg-white rounded-xl shadow-lg p-6 border border-teal-100">
+            <div className="flex items-center justify-between">
+              <div>
+                <h1 className="text-4xl font-light text-gray-800 mb-2">Portfolio Overview</h1>
+                <p className="text-gray-500 text-xl">Yahya Chaker</p>
+                <p className="text-gray-500 text-lg">FM Projects Director</p>
+              </div>
+              <div className="flex gap-8">
+                <div className="text-center">
+                  <p className="text-4xl font-light text-teal-600">{data.length}</p>
+                  <p className="text-sm text-gray-500">Projects</p>
                 </div>
+                <div className="text-center">
+                  <p className="text-4xl font-light text-teal-600">{(totalContractValue / 1000000).toFixed(1)}M</p>
+                  <p className="text-sm text-gray-500">QAR Value</p>
                 </div>
-
-                {/* Project Matrix */}
-                <div className="grid grid-cols-2 gap-6 mb-8">
-                    <Card className="bg-white shadow-lg">
-                        <CardHeader>
-                            <CardTitle className="text-xl font-light text-center">Project Performance Matrix</CardTitle>
-                        </CardHeader>
-                        <CardContent className="flex flex-col items-center justify-center"> 
-                            <ChartErrorBoundary>
-                                <ChartWrapper>
-                                    <RadarChart data={radarData}>
-                                        <PolarGrid stroke="#e2e8f0" />
-                                        <PolarAngleAxis dataKey="name" tick={{ fill: '#64748b', fontSize: 12 }} />
-                                        <PolarRadiusAxis angle={30} domain={[0, 100]} />
-                                        <Radar name="Project Metrics" dataKey="Contract Value" stroke="#0d9488" fill="#0d9488" fillOpacity={0.3} />
-                                        <Radar name="Duration" dataKey="Duration" stroke="#0369a1" fill="#0369a1" fillOpacity={0.3} />
-                                        <Radar name="Progress" dataKey="Progress" stroke="#2dd4bf" fill="#2dd4bf" fillOpacity={0.3} />
-                                        <Legend 
-                                            align="center" // Center horizontally
-                                            verticalAlign="bottom" // Place at the bottom
-                                            layout="horizontal" // Display items in a row
-                                        />
-                                    </RadarChart>
-                                </ChartWrapper>
-                            </ChartErrorBoundary>
-                        </CardContent>
-                    </Card>
-
-                    <Card className="bg-white shadow-lg">
-                        <CardHeader>
-                            <CardTitle className="text-xl font-light text-center">Project Value vs Resources</CardTitle>
-                        </CardHeader>
-                        <CardContent className="flex flex-col items-center justify-center">
-                            <ChartErrorBoundary>
-                                <ChartWrapper>
-                                    <ComposedChart data={bubbleData} margin={{ top: 20, right: 30, left: 20, bottom: 40 }}>
-                                        <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
-                                        <XAxis 
-                                            dataKey="Contract Value" 
-                                            label={{ value: 'Contract Value (M QAR)', position: 'bottom', offset: 0 }}
-                                        />
-                                        <YAxis 
-                                            dataKey="manpower" 
-                                            label={{ value: 'Manpower', angle: -90, position: 'insideLeft', offset: -10 }}
-                                        />
-                                        <Tooltip />
-                                        <Legend 
-                                            align="center"
-                                            verticalAlign="bottom"
-                                            layout="horizontal"
-                                            content={({payload}) => (
-                                                <div className="flex justify-center gap-6 p-2">
-                                                    <div className="flex items-center gap-2">
-                                                        <div className="w-3 h-3 rounded-full bg-teal-600"></div>
-                                                        <span className="text-sm">Ongoing</span>
-                                                    </div>
-                                                    <div className="flex items-center gap-2">
-                                                        <div className="w-3 h-3 rounded-full bg-blue-600"></div>
-                                                        <span className="text-sm">Mobilisation</span>
-                                                    </div>
-                                                    <div className="flex items-center gap-2">
-                                                        <div className="w-3 h-3 rounded-full bg-gray-500"></div>
-                                                        <span className="text-sm">Not Started</span>
-                                                    </div>
-                                                </div>
-                                            )}
-                                        />
-                                        <Scatter name="Projects" data={bubbleData} fill="#0d9488">
-                                            {bubbleData.map((entry, index) => (
-                                                <Cell
-                                                    key={`cell-${index}`}
-                                                    fill={STATUS_COLORS[entry.status]}
-                                                    opacity={0.7}
-                                                />
-                                            ))}
-                                        </Scatter>
-                                        <Area 
-                                            name="Progress"
-                                            type="monotone" 
-                                            dataKey="progress" 
-                                            stroke="#2dd4bf" 
-                                            fill="#2dd4bf" 
-                                            fillOpacity={0.1} 
-                                        />
-                                    </ComposedChart>
-                                </ChartWrapper>
-                            </ChartErrorBoundary>
-                        </CardContent>
-                    </Card>
+                <div className="text-center">
+                  <p className="text-4xl font-light text-teal-600">{totalManpower}</p>
+                  <p className="text-sm text-gray-500">Personnel</p>
                 </div>
-                
-                {/* Time Allocation Section */}
-                <Card className="bg-white shadow-lg mb-8 time-allocation-section">
-                <CardHeader>
-                    <CardTitle className="text-xl font-light">Project Time Allocation & Progress</CardTitle>
-                </CardHeader>
-                <CardContent>
-                    <div className="space-y-6">
-                    {data.map((project, index) => {
-                        const timeSpent = parsePercentage(project['Time spending']);
-                        return (
-                        <div key={index} className="relative">
-                            <div className="flex items-center mb-4">
-                            <div className="w-1/4">
-                                <h3 className="text-sm font-medium text-gray-900">{project['Project Name']}</h3>
-                                <p className="text-xs text-gray-500">SAP ID: {project['SAP ID']}</p>
-                                <p className="text-xs text-gray-600 mt-1">
-                                Total Duration: {project['Duration (Months)']} months
-                                </p>
-                            </div>
-                            <div className="w-3/4">
-                                <div className="relative h-6 bg-gray-100 rounded-lg overflow-hidden">
-                                <div
-                                    className="absolute top-0 left-0 h-full transition-all duration-500"
-                                    style={{
-                                    width: `${timeSpent * 100}%`,
-                                    backgroundColor: STATUS_COLORS[project.Status]
-                                    }}
-                                />
-                                <div 
-                                    className="absolute top-0 left-0 h-full flex items-center" 
-                                    style={{ marginLeft: `${Math.min(timeSpent * 100 + 1, 95)}%` }}
-                                >
-                                    <span className="text-xs text-gray-700 font-medium whitespace-nowrap">
-                                    {(timeSpent * 100).toFixed(0)}% allocated time
-                                    </span>
-                                </div>
-                                </div>
-                                <div className="flex justify-between mt-2">
-                                <div className="text-xs">
-                                <span className="text-gray-600 font-medium">Start: </span>
-                                    <span className="text-gray-500">{project['Start Date']}</span>
-                                </div>
-                                <div className="text-xs">
-                                    <span className="text-gray-600 font-medium">Time Remaining: </span>
-                                    <span className="text-gray-500">
-                                    {calculateTimeRemaining(project['End Date'])} months
-                                    </span>
-                                </div>
-                                <div className="text-xs">
-                                    <span className="text-gray-600 font-medium">End: </span>
-                                    <span className="text-gray-500">{project['End Date']}</span>
-                                </div>
-                                </div>
-                            </div>
-                            </div>
-                        </div>
-                        );
-                    })}
-                    </div>
-                </CardContent>
-                </Card>
-
-                {/* Project Details Table */}
-                <Card className="bg-white shadow-lg project-details-section">
-                <CardHeader>
-                    <CardTitle className="text-xl font-light">Project Details</CardTitle>
-                </CardHeader>
-                <CardContent>
-                    <div className="overflow-x-auto">
-                    <table className="min-w-full">
-                        <thead>
-                        <tr>
-                            <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Project</th>
-                            <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Value (QAR)</th>
-                            <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Manpower</th>
-                            <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                            <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Criticality</th>
-                        </tr>
-                        </thead>
-                        <tbody className="divide-y divide-gray-100">
-                        {data.map((project, index) => {
-                            const criticality = getCriticalityForProject(project['Project Name']);
-                            const criticalityStyle = CRITICALITY_COLORS[criticality];
-
-                            return (
-                            <tr key={index} className="hover:bg-gray-50">
-                                <td className="px-6 py-4">
-                                <div className="text-sm font-medium text-gray-900">{project['Project Name']}</div>
-                                <div className="text-xs text-gray-500">{project['SAP ID']}</div>
-                                </td>
-                                <td className="px-6 py-4">
-                                <div className="text-sm text-gray-900">
-                                    {(parseNumber(project['Contract Value'])/1000000).toFixed(1)}M
-                                </div>
-                                </td>
-                                <td className="px-6 py-4">
-                                <div className="text-sm text-gray-900">{parseNumber(project.manpower)}</div>
-                                </td>
-                                <td className="px-6 py-4">
-                                <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-                                    project.Status === 'Ongoing' ? 'bg-teal-100 text-teal-800' :
-                                    project.Status === 'Mobilisation' ? 'bg-blue-100 text-blue-800' :
-                                    'bg-gray-100 text-gray-800'
-                                }`}>
-                                    {project.Status}
-                                </span>
-                                </td>
-                                <td className="px-6 py-4">
-                                <span className={`px-3 py-1 rounded-full text-xs font-medium ${criticalityStyle.bg} ${criticalityStyle.text}`}>
-                                    {criticality}
-                                </span>
-                                </td>
-                            </tr>
-                            );
-                        })}
-                        <tr className="bg-gray-50 font-medium">
-                            <td className="px-6 py-4 text-sm text-gray-900">Total</td>
-                            <td className="px-6 py-4 text-sm text-gray-900">{(totalContractValue/1000000).toFixed(1)}M</td>
-                            <td className="px-6 py-4 text-sm text-gray-900">{totalManpower}</td>
-                            <td className="px-6 py-4"></td>
-                            <td className="px-6 py-4"></td>
-                        </tr>
-                        </tbody>
-                    </table>
-                    </div>
-                </CardContent>
-                </Card>
-
-                {/* Print Button */}
-                {/* Print Button - with no-print class */}
-                <div className="fixed bottom-8 right-8 no-print">
-                    {/* <div className="mb-2 text-sm text-gray-600">
-                        Tip: For best results, uncheck "Headers and footers" in print settings
-                    </div> */}
-                    <button 
-                        onClick={handlePrint}
-                        className="px-6 py-3 bg-gray-800 text-white rounded-lg hover:bg-gray-700 transition-colors flex items-center gap-2 shadow-md"
-                    >
-                        <Printer className="h-5 w-5" />
-                        Print Dashboard
-                    </button>
-                </div>
+              </div>
+              <div className="border-l border-gray-200 pl-8">
+                <img 
+                  src="/Elegancia_Logo.png" 
+                  alt="Elegancia Logo" 
+                  className="h-16 w-auto"
+                />
             </div>
+          </div>
         </div>
-        <PrintFooter />
+
+          {/* All Charts Row */}
+          <div className="flex gap-6 mb-8">
+            {/* Project Values Chart */}
+            <Card className="bg-white shadow-lg flex-1">
+              <CardHeader>
+                <CardTitle className="text-xl font-light">Project Contract Values</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <ChartErrorBoundary>
+                  <div className="h-[350px]">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart
+                        data={data.map(project => ({
+                          name: project['Project Name'],
+                          value: parseNumber(project['Contract Value']) / 1000000
+                        }))}
+                        layout="vertical"
+                        margin={{ top: 5, right: 30, left: 5, bottom: 5 }}
+                      >
+                        <CartesianGrid strokeDasharray="3 3" horizontal={false} />
+                        <XAxis type="number" unit="M" />
+                        <YAxis 
+                          type="category" 
+                          dataKey="name" 
+                          width={170}
+                          tick={{ 
+                            fontSize: 11,
+                            fill: '#4B5563'
+                          }}
+                        />
+                        <Tooltip 
+                          formatter={(value) => `${typeof value === 'number' ? value.toFixed(1) : value}M QAR`}
+                        />
+                        <Bar dataKey="value" fill="#0d9488">
+                          {data.map((entry, index) => (
+                            <Cell key={`cell-${index}`} fill={STATUS_COLORS[entry.Status]} />
+                          ))}
+                        </Bar>
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
+                </ChartErrorBoundary>
+              </CardContent>
+            </Card>
+
+            {/* Project Value vs Resources Chart */}
+            <Card className="bg-white shadow-lg flex-1">
+              <CardHeader>
+                <CardTitle className="text-xl font-light">Project Value vs Resources</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <ChartErrorBoundary>
+                  <div className="h-[350px]">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <ComposedChart data={bubbleData}>
+                        <CartesianGrid strokeDasharray="6 6" stroke="#e2e8f0" />
+                        <XAxis 
+                          dataKey="Contract Value" 
+                          tickFormatter={(value) => Math.round(value).toString()}            
+                          label={{ 
+                            value: 'Contract Value (M QAR)', 
+                            position: 'bottom',
+                            offset: -7,
+                            sort: true
+                          }}
+                        />
+                        <YAxis dataKey="manpower" label={{ value: 'Manpower', angle: -90, position: 'insideLeft' }} />
+                        <Tooltip />
+                        <Scatter name="Projects" data={bubbleData} fill="#0d9488">
+                          {bubbleData.map((entry, index) => (
+                            <Cell
+                              key={`cell-${index}`}
+                              fill={STATUS_COLORS[entry.status]}
+                              opacity={0.7}
+                            />
+                          ))}
+                        </Scatter>
+                        <Area type="monotone" dataKey="progress" stroke="#2dd4bf" fill="#2dd4bf" fillOpacity={0.1} />
+                      </ComposedChart>
+                    </ResponsiveContainer>
+                  </div>
+                </ChartErrorBoundary>
+              </CardContent>
+            </Card>
+
+            {/* Time Allocation Pie Chart */}
+            <Card className="bg-white shadow-lg flex-1">
+              <CardHeader>
+                <CardTitle className="text-xl font-light">Projects Time Allocation</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="flex flex-col h-[350px]">
+                  {/* Pie Chart */}
+                  <ChartErrorBoundary>
+                    <div className="flex-1 h-full">
+                      <ResponsiveContainer width="100%" height={280}>
+                        <PieChart margin={{ top: 0, right: 0, left: 0, bottom: 0 }}>
+                          <Pie
+                            data={data.map(project => ({
+                              name: project['Project Name'],
+                              value: parseNumber(project['Time spending'])
+                            }))}
+                            cx="50%"
+                            cy="50%"
+                            outerRadius={80}      // Reduced from 120
+                            innerRadius={10}      // Reduced from 80
+                            dataKey="value"
+                            nameKey="name"
+                            label={({
+                              cx,
+                              cy,
+                              midAngle,
+                              innerRadius,
+                              outerRadius,
+                              value,
+                              name
+                            }) => {
+                              const RADIAN = Math.PI / 180;
+                              const radius = outerRadius + 15;  // Reduced from 25
+                              const x = cx + radius * Math.cos(-midAngle * RADIAN);
+                              const y = cy + radius * Math.sin(-midAngle * RADIAN);
+
+                              // Split name if longer than 15 characters
+                              const words = name.split(' ');
+                              const firstLine = words.slice(0, 2).join(' ');
+                              const secondLine = words.slice(2).join(' ');
+
+                              return (
+                                <g>
+                                  <text
+                                    x={x}
+                                    y={y - 6}  // Move up for first line
+                                    fill="#4B5563"
+                                    textAnchor={x > cx ? 'start' : 'end'}
+                                    fontSize="9"  // Reduced from 11
+                                  >
+                                    {firstLine}
+                                  </text>
+                                  {secondLine && (
+                                    <text
+                                      x={x}
+                                      y={y + 6}  // Move down for second line
+                                      fill="#4B5563"
+                                      textAnchor={x > cx ? 'start' : 'end'}
+                                      fontSize="9"  // Reduced from 11
+                                    >
+                                      {`${secondLine} (${value}%)`}
+                                    </text>
+                                  )}
+                                  {!secondLine && (
+                                    <text
+                                      x={x}
+                                      y={y + 6}  // Value on second line if no second line of text
+                                      fill="#4B5563"
+                                      textAnchor={x > cx ? 'start' : 'end'}
+                                      fontSize="9"
+                                    >
+                                      {`(${value}%)`}
+                                    </text>
+                                  )}
+                                </g>
+                              );
+                            }}
+                            labelLine={true}
+                          >
+                            {data.map((entry, index) => (
+                              <Cell key={`cell-${index}`} fill={STATUS_COLORS[entry.Status]} />
+                            ))}
+                          </Pie>
+                          <Tooltip 
+                            formatter={(value) => `${value}%`}
+                          />
+                        </PieChart>
+                      </ResponsiveContainer>
+                    </div>
+                  </ChartErrorBoundary>
+
+                  {/* Status Legend */}
+                  <div className="flex justify-center gap-4 mt-4">
+                    {Object.entries(STATUS_COLORS).map(([status, color]) => (
+                      <div key={status} className="flex items-center gap-2">
+                        <div 
+                          className="w-3 h-3 rounded-full" 
+                          style={{ backgroundColor: color }}
+                        />
+                        <span className="text-sm text-gray-600">{status}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+
+        {/* Second Page Content */}
+        <div className="time-allocation-section page-break">               
+          {/* Time Allocation Section */}
+          <Card className="bg-white shadow-lg mb-8 page-break">
+            <CardHeader>
+              <CardTitle className="text-xl font-light">Project Time Allocation & Progress</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-6">
+                {data.map((project, index) => {
+                  const timeSpent = parsePercentage(project['Time spending']);
+                  return (
+                    <div key={index} className="relative">
+                      <div className="flex items-center mb-4">
+                        <div className="w-1/4">
+                          <h3 className="text-sm font-medium text-gray-900">{project['Project Name']}</h3>
+                          <p className="text-xs text-gray-500">SAP ID: {project['SAP ID']}</p>
+                          <p className="text-xs text-gray-600 mt-1">
+                            Total Duration: {project['Duration (Months)']} months
+                          </p>
+                        </div>
+                        <div className="w-3/4">
+                          <div className="relative h-6 bg-gray-100 rounded-lg overflow-hidden">
+                            <div
+                              className="absolute top-0 left-0 h-full transition-all duration-500"
+                              style={{
+                                width: `${timeSpent * 100}%`,
+                                backgroundColor: STATUS_COLORS[project.Status]
+                              }}
+                            />
+                            <div 
+                              className="absolute top-0 left-0 h-full flex items-center" 
+                              style={{ marginLeft: `${Math.min(timeSpent * 100 + 1, 95)}%` }}
+                            >
+                              <span className="text-xs text-gray-700 font-medium whitespace-nowrap">
+                                {(timeSpent * 100).toFixed(0)}% allocated time
+                              </span>
+                            </div>
+                          </div>
+                          <div className="flex justify-between mt-2">
+                            <div className="text-xs">
+                              <span className="text-gray-600 font-medium">Start: </span>
+                              <span className="text-gray-500">{project['Start Date']}</span>
+                            </div>
+                            <div className="text-xs">
+                              <span className="text-gray-600 font-medium">Time Remaining: </span>
+                              <span className="text-gray-500">
+                                {calculateTimeRemaining(project['End Date'])} months
+                              </span>
+                            </div>
+                            <div className="text-xs">
+                              <span className="text-gray-600 font-medium">End: </span>
+                              <span className="text-gray-500">{project['End Date']}</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Third Page Content */}
+        <div className="project-details-section page-break">
+          {/* Project Details Table */}
+          <Card className="bg-white shadow-lg page-break">
+            <CardHeader>
+              <CardTitle className="text-xl font-light">Project Details</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="overflow-x-auto">
+                <table className="min-w-full">
+                  <thead>
+                    <tr>
+                      <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Project</th>
+                      <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Value (QAR)</th>
+                      <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Manpower</th>
+                      <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                      <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Criticality</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-100">
+                    {data.map((project, index) => {
+                      const criticality = getCriticalityForProject(project['Project Name']);
+                      const criticalityStyle = CRITICALITY_COLORS[criticality];
+
+                      return (
+                        <tr key={index} className="hover:bg-gray-50">
+                          <td className="px-6 py-4">
+                            <div className="text-sm font-medium text-gray-900">{project['Project Name']}</div>
+                            <div className="text-xs text-gray-500">{project['SAP ID']}</div>
+                          </td>
+                          <td className="px-6 py-4">
+                            <div className="text-sm text-gray-900">
+                              {(parseNumber(project['Contract Value'])/1000000).toFixed(1)}M
+                            </div>
+                          </td>
+                          <td className="px-6 py-4">
+                            <div className="text-sm text-gray-900">{parseNumber(project.manpower)}</div>
+                          </td>
+                          <td className="px-6 py-4">
+                            <span className={`px-3 py-1 rounded-full text-xs font-medium ${
+                              project.Status === 'Ongoing' ? 'bg-teal-100 text-teal-800' :
+                              project.Status === 'Mobilisation' ? 'bg-blue-100 text-blue-800' :
+                              'bg-gray-100 text-gray-800'
+                            }`}>
+                              {project.Status}
+                            </span>
+                          </td>
+                          <td className="px-6 py-4">
+                            <span className={`px-3 py-1 rounded-full text-xs font-medium ${criticalityStyle.bg} ${criticalityStyle.text}`}>
+                              {criticality}
+                            </span>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                    <tr className="bg-gray-50 font-medium">
+                      <td className="px-6 py-4 text-sm text-gray-900">Total</td>
+                      <td className="px-6 py-4 text-sm text-gray-900">{(totalContractValue/1000000).toFixed(1)}M</td>
+                      <td className="px-6 py-4 text-sm text-gray-900">{totalManpower}</td>
+                      <td className="px-6 py-4"></td>
+                      <td className="px-6 py-4"></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Print Button */}
+        <div className="fixed bottom-8 right-8 no-print">
+          <button 
+            onClick={handlePrint}
+            className="px-6 py-3 bg-gray-800 text-white rounded-lg hover:bg-gray-700 transition-colors flex items-center gap-2 shadow-md"
+          >
+            <Printer className="h-5 w-5" />
+            Print Dashboard
+          </button>
+        </div>
+      </div>
     </div>
   );
-}
+};
+
 export default PortfolioDashboard;
